@@ -42,7 +42,7 @@ def get_order(order_id):
         return cur.fetchone()
 
 
-def nearest_clusters(vec, stage, issue_type, limit=5):
+def nearest_clusters(vec, stage, issue_type, limit=1):
     vec_str = "[" + ",".join(str(float(x)) for x in vec) + "]"
     sql = """
         SELECT c.cluster_id, c.title, c.status, c.regression,
@@ -138,6 +138,9 @@ def save_extract(review_id, data):
         ON CONFLICT (review_id) DO UPDATE SET
             stage = EXCLUDED.stage,
             issue_type = EXCLUDED.issue_type,
+            is_bug = EXCLUDED.is_bug,
+            is_feature_request = EXCLUDED.is_feature_request,
+            severity = EXCLUDED.severity,
             summary = EXCLUDED.summary,
             evidence_quote = EXCLUDED.evidence_quote,
             confidence = EXCLUDED.confidence

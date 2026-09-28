@@ -5,7 +5,7 @@ from config import STAGES, ISSUE_TYPES, LLM_MODEL, LLM_BASE_URL, LLM_API_KEY
 
 _llm = OpenAI(base_url=LLM_BASE_URL, api_key=LLM_API_KEY)
 
-BATCH_SIZE = 20   # reviews per LLM call
+BATCH_SIZE = 5  # reviews per LLM call
 
 _EXTRACT_SYSTEM = """You extract structured data from customer reviews
 for a custom sticker printing service.

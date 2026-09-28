@@ -1,6 +1,5 @@
 import json
 import uuid
-import numpy as np
 from openai import OpenAI
 from sentence_transformers import SentenceTransformer
 
@@ -79,20 +78,24 @@ class Filer:
     # ----- internals -----
 
     def _same_issue(self, extract, cluster):
-        sample = db.get_cluster_sample_review(cluster["cluster_id"])
-        prompt = _JUDGE_PROMPT.format(
-            title=cluster["title"],
-            example=(sample or {}).get("summary", ""),
-            new_summary=extract["summary"],
-            new_quote=extract.get("evidence_quote", ""),
-        )
-        resp = _llm.chat.completions.create(
-            model=LLM_MODEL,
-            response_format={"type": "json_object"},
-            temperature=0,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        return bool(json.loads(resp.choices[0].message.content).get("same_issue"))
+        try:
+            sample = db.get_cluster_sample_review(cluster["cluster_id"])
+            prompt = _JUDGE_PROMPT.format(
+                title=cluster["title"],
+                example=(sample or {}).get("summary", ""),
+                new_summary=extract["summary"],
+                new_quote=extract.get("evidence_quote", ""),
+            )
+            resp = _llm.chat.completions.create(
+                model=LLM_MODEL,
+                response_format={"type": "json_object"},
+                temperature=0,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            return bool(json.loads(resp.choices[0].message.content).get("same_issue"))
+        except Exception as e:
+            print(f"  ! judge failed: {e}; defaulting to new cluster")
+            return False
 
     def _attach(self, cluster, review):
         db.attach_to_cluster(cluster["cluster_id"], review["review_id"])
@@ -121,14 +124,17 @@ class Filer:
         return {"action": "new", "cluster_id": cid}
 
     def _name_cluster(self, extract):
-        prompt = _NAME_PROMPT.format(
-            reviews=json.dumps([extract], indent=2, default=str)
-        )
-        resp = _llm.chat.completions.create(
-            model=LLM_MODEL,
-            response_format={"type": "json_object"},
-            temperature=0,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        data = json.loads(resp.choices[0].message.content)
-        return data.get("title", "Untitled"), data.get("suggested_action", "")
+        try:
+            prompt = _NAME_PROMPT.format(
+                reviews=json.dumps([extract], indent=2, default=str)
+            )
+            resp = _llm.chat.completions.create(
+                model=LLM_MODEL,
+                response_format={"type": "json_object"},
+                temperature=0,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            data = json.loads(resp.choices[0].message.content)
+            return data.get("title", "Untitled"), data.get("suggested_action", "")
+        except Exception:
+            return "Untitled", ""

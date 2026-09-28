@@ -175,6 +175,18 @@ def make_reviews(orders):
 
 # ---------- insertion ----------
 
+def reset_tables():
+    with psycopg.connect(DB_URL, row_factory=dict_row) as conn:
+        with conn.cursor() as cur:
+            cur.execute("""
+                TRUNCATE review_clusters, issue_clusters,
+                         review_embeddings, review_extracts,
+                         reviews, orders, users
+                CASCADE
+            """)
+        conn.commit()
+    print("Tables truncated.")
+
 def insert_all():
     users = [
         {
@@ -240,4 +252,7 @@ def insert_all():
 
 
 if __name__ == "__main__":
+    import sys
+    if "--reset" in sys.argv:
+        reset_tables()
     insert_all()

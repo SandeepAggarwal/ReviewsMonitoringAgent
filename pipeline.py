@@ -13,18 +13,23 @@ from scorer import Scorer
 def run_daily():
     reviews = db.get_new_reviews()
     print(f"[run_daily] new reviews: {len(reviews)}")
+    if not reviews:
+        return
 
     reader = Reader()
     filer = Filer(Embedder())
     scorer = Scorer()
 
-    for r in reviews:
-        try:
-            extract = reader.extract(r)
-        except Exception as e:
-            print(f"  ! extract failed {r['review_id']}: {e}")
-            continue
+    print(f"[run_daily] extracting {len(reviews)} reviews "
+          f"(batch size {reader.batch_size})...")
+    extracts = reader.extract_many(reviews)
+    print(f"[run_daily] extracted {len(extracts)}/{len(reviews)}")
 
+    for r in reviews:
+        extract = extracts.get(r["review_id"])
+        if not extract:
+            print(f"  ! no extract for {r['review_id']}, skipping")
+            continue
         db.save_extract(r["review_id"], extract)
         result = filer.file(r, extract)
         print(f"  {r['review_id']} -> {result['action']} {result['cluster_id']}")
