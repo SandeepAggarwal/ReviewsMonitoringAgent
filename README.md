@@ -1,4 +1,4 @@
-# Reviews Handler Agent
+# Reviews Monitoring Agent
 
 An AI agent that reads customer reviews daily, groups similar issues into clusters, and produces a prioritized digest of bugs, bottlenecks, and feature requests — ranked by revenue at risk, refunds, churn, ratings, and SLA breaches.
 
@@ -118,7 +118,7 @@ You should see the model name in the response. That exact string must match `LLM
 
 ```bash
 git clone <your-repo-url>
-cd ReviewsHandlerAgent
+cd ReviewsMonitoringAgent
 
 python -m venv venv
 source venv/bin/activate
@@ -199,7 +199,7 @@ python pipeline.py
 Add to crontab (`crontab -e`):
 
 ```cron
-0 7 * * * cd /path/to/ReviewsHandlerAgent && /path/to/venv/bin/python pipeline.py >> /var/log/review_agent.log 2>&1
+0 7 * * * cd /path/to/ReviewsMonitoringAgent && /path/to/venv/bin/python pipeline.py >> /var/log/review_agent.log 2>&1
 ```
 
 The digest is posted to Slack if `SLACK_WEBHOOK_URL` is set, otherwise printed to stdout (which cron captures in the log).
@@ -318,7 +318,7 @@ Then remove any `postgresql@16` PATH line from `~/.zshrc`.
 ## Project structure
 
 ```
-ReviewsHandlerAgent/
+ReviewsMonitoringAgent/
 ├── .env                 # Local config (gitignored)
 ├── .env.example         # Template
 ├── schema.sql           # Postgres DDL
