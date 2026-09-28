@@ -103,7 +103,7 @@ psql sticker_reviews -f schema.sql
 
 ```bash
 pip install mlx-lm
-mlx_lm.server --model mlx-community/Qwen-3.5-4B-8bit --port 8080
+mlx_lm.server --model mlx-community/Qwen-3.5-4B-8bit --port 8080 --max-tokens 1024 --chat-template-args '{"enable_thinking":false}'
 ```
 
 Leave this running in a separate terminal. Verify it's up:
@@ -166,7 +166,7 @@ Expected: `[]` (empty list).
 Make sure the MLX server is running in one terminal:
 
 ```bash
-mlx_lm.server --model mlx-community/Qwen-3.5-4B-8bit --port 8080
+mlx_lm.server --model mlx-community/Qwen-3.5-4B-8bit --port 8080 --max-tokens 1024 --chat-template-args '{"enable_thinking":false}'
 ```
 
 Then in another terminal:
@@ -188,7 +188,7 @@ That means the whole chain works.
 To load mock data and watch the agent actually process reviews:
 
 ```bash
-python seed.py
+python seed.py --reset
 python pipeline.py
 ```
 
