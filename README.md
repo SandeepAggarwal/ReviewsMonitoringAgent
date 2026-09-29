@@ -302,19 +302,6 @@ The local model isn't following the taxonomy. Either upgrade the model (7B+), or
 
 ---
 
-## Uninstall PostgreSQL 16 (if you had it)
-
-```bash
-brew services stop postgresql@16
-brew uninstall --force postgresql@16
-rm -rf /opt/homebrew/var/postgresql@16
-brew cleanup postgresql@16
-```
-
-Then remove any `postgresql@16` PATH line from `~/.zshrc`.
-
----
-
 ## Project structure
 
 ```
